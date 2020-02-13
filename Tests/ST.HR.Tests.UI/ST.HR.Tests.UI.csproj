@@ -13,6 +13,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\Domain\ST.HR.Domain.DAL\ST.HR.Domain.DAL.csproj" />
+        <ProjectReference Include="..\..\Services\ST.HR.Services.Sql\ST.HR.Services.Sql.csproj" />
+        <ProjectReference Include="..\..\UI\ST.HR.UI\ST.HR.UI.csproj" />
         <ProjectReference Include="..\ST.HR.Tests.Common\ST.HR.Tests.Common.csproj" />
     </ItemGroup>
     
