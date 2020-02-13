@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Domain\ST.HR.Domain.DAL\ST.HR.Domain.DAL.csproj" />
+      <ProjectReference Include="..\ST.HR.Services.Sql.Interfaces\ST.HR.Services.Sql.Interfaces.csproj" />
+    </ItemGroup>
+
+</Project>

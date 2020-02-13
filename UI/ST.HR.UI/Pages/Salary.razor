@@ -1,0 +1,114 @@
+﻿@page "/salary"
+@attribute [Authorize]
+@inject HttpContextAccessor HttpContextAccessor
+@inject IEmployeeService EmployeeService
+@inject ISalaryRuleService SalaryRuleService
+
+<h1>Salary</h1>
+
+@if (_model == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h3>Calculate</h3>
+    
+    <input type="date" @bind="@_dateFrom" format-value="dd-MM-yyyy"/>
+    <input type="date" @bind="@_dateTo" format-value="dd-MM-yyyy"/>
+    <button class="btn btn-primary" @onclick="@(async e => await OnCalculateClick())">Calculate</button>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Employment date</th>
+                <th>Group</th>
+                <th>Base salary rate</th>
+                <th>Year premium</th>
+                <th>SubordinatePremium</th>
+                <th>Head</th>
+                <th>Subordinate count</th>
+                <th>Salary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var model in _model)
+            {
+                <tr class="@(_currentUserId == model.Id ? "alert-info" : "")">
+                    <td> @model.Id </td>
+                    <td> @model.Name </td>
+                    <td> @model.EmploymentDate </td>
+                    <td> @model.Group </td>
+                    <td> @model.BaseSalaryRate </td>
+                    <td> @model.YearPremium </td>
+                    <td> @model.SubordinatePremium </td>
+                    <td> @model.Head?.Name </td>
+                    <td> @model.Subordinate.Count </td>
+                    <td> @model.Salary </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    private long _currentUserId;
+    private List<EmployeeModel> _model;
+    private List<SalaryRule> _rules;
+
+    private DateTime _dateFrom;
+    private DateTime _dateTo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (_model != null)
+            return;
+
+        _dateFrom = DateTime.Today;
+        _dateTo = DateTime.Today;
+
+        _rules = await SalaryRuleService.GetAsync();
+        
+        var user = (await AuthenticationStateTask).User;
+        
+        var sid = ClaimsHelper.GetClaim(user, ClaimTypes.Sid);
+        _currentUserId = long.Parse(sid);
+        
+        var currentUser = await EmployeeService.GetAsync(_currentUserId);
+        var employees = new List<Employee>()
+        {
+            currentUser
+        };
+
+        if (currentUser.Administrator)
+            employees =  await EmployeeService.GetAsync();
+        
+        _model = new List<EmployeeModel>();
+        foreach (var employee in employees)
+            AddToModel(await EmployeeModel.CreateInstance(EmployeeService, employee));
+    }
+
+    private void AddToModel(EmployeeModel model)
+    {
+        _model.Add(model);
+
+        foreach (var subModel in model.Subordinate)
+            AddToModel(subModel);
+    }
+
+    protected async Task OnCalculateClick()
+    {
+        foreach (var model in _model)
+            model.Calculated = false;
+        
+        foreach (var model in _model)
+            if (!model.Calculated)
+                model.Calculate(_dateFrom, _dateTo, _rules);
+    }
+
+}

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Common\ST.HR.Common.Tools\ST.HR.Common.Tools.csproj" />
+      <ProjectReference Include="..\..\Domain\ST.HR.Domain.DAL\ST.HR.Domain.DAL.csproj" />
+      <ProjectReference Include="..\..\Services\ST.HR.Services.Sql.Interfaces\ST.HR.Services.Sql.Interfaces.csproj" />
+      <ProjectReference Include="..\..\Services\ST.HR.Services.Sql\ST.HR.Services.Sql.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="mono_crash.mem.2459.1.blob" />
+    </ItemGroup>
+
+</Project>
